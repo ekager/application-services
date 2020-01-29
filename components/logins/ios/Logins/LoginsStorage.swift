@@ -372,6 +372,19 @@ open class LoginsStorage {
         }
     }
 
+    /// Get the set of potential duplicates ignoring the username of `login`.
+    open func potentialDupesIgnoringUsername(to login: LoginRecord) throws -> [LoginRecord] {
+        let json = try login.toJSON()
+        return try queue.sync {
+            let engine = try self.getUnlocked()
+            let rustStr = try LoginsStoreError.unwrap { err in
+                sync15_passwords_potential_dupes_ignoring_username(engine, json, err)
+            }
+            let jsonStr = String(freeingRustString: rustStr)
+            return try LoginRecord.fromJSONArray(jsonStr)
+        }
+    }
+
     /// Get the list of records for some base domain.
     open func getByBaseDomain(baseDomain: String) throws -> [LoginRecord] {
         return try queue.sync {

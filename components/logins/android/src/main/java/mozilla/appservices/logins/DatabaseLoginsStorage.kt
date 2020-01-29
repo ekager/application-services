@@ -275,6 +275,20 @@ class DatabaseLoginsStorage(private val dbPath: String) : AutoCloseable, LoginsS
         }
     }
 
+    @Synchronized
+    @Throws(LoginsStorageException::class)
+    override fun potentialDupesIgnoringUsername(login: ServerPassword): List<ServerPassword> {
+        readQueryCounters.measure {
+            val s = login.toJSON().toString()
+            val json = rustCallWithLock { raw, error ->
+                LoginsStoreMetrics.readQueryTime.measure {
+                    PasswordSyncAdapter.INSTANCE.sync15_passwords_potential_dupes_ignoring_username(raw, s, error)
+                }
+            }.getAndConsumeRustString()
+            ServerPassword.fromJSONArray(json)
+        }
+    }
+
     @Throws(InvalidRecordException::class)
     override fun ensureValid(login: ServerPassword) {
         readQueryCounters.measure {

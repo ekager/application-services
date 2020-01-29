@@ -342,6 +342,24 @@ pub extern "C" fn sync15_passwords_get_by_base_domain(
 }
 
 #[no_mangle]
+pub extern "C" fn sync15_passwords_potential_dupes_ignoring_username(
+    handle: u64,
+    record_json: FfiStr<'_>,
+    error: &mut ExternError,
+) -> *mut c_char {
+    log::debug!("sync15_passwords_potential_dupes_ignoring_username");
+    ENGINES.call_with_result(error, handle, |state| -> Result<String> {
+        let parsed: Login = serde_json::from_str(record_json.as_str())?;
+        let records = state
+            .lock()
+            .unwrap()
+            .potential_dupes_ignoring_username(parsed)?;
+        let result = serde_json::to_string(&records)?;
+        Ok(result)
+    })
+}
+
+#[no_mangle]
 pub extern "C" fn sync15_passwords_get_by_id(
     handle: u64,
     id: FfiStr<'_>,
