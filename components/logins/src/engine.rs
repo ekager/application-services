@@ -57,7 +57,7 @@ impl PasswordEngine {
     }
 
     pub fn potential_dupes_ignoring_username(&self, login: Login) -> Result<Vec<Login>> {
-        self.db.potential_dupes_ignoring_username(&login)
+        self.db.potential_dupes_ignoring_username(login)
     }
 
     pub fn touch(&self, id: &str) -> Result<()> {

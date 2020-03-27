@@ -478,8 +478,8 @@ class DatabaseLoginsStorageTest {
         )
 
         val potentialDupes = test.potentialDupesIgnoringUsername(dupeLogin)
-
-        assertEquals(potentialDupes, listOf(savedLogin1))
+        assert(potentialDupes.size == 1)
+        assertEquals(potentialDupes[0].id, savedLogin1.id)
 
         test.delete("bbbbb")
     }

@@ -856,7 +856,7 @@ impl LoginDb {
         )?)
     }
 
-    pub fn potential_dupes_ignoring_username(&self, login: &Login) -> Result<Vec<Login>> {
+    pub fn potential_dupes_ignoring_username(&self, login: Login) -> Result<Vec<Login>> {
         // Could be lazy_static-ed...
         lazy_static::lazy_static! {
             static ref DUPES_IGNORING_USERNAME_SQL: String = format!(
@@ -885,7 +885,7 @@ impl LoginDb {
         }
         let mut stmt = self.db.prepare_cached(&DUPES_IGNORING_USERNAME_SQL)?;
         let params = named_params! {
-            ":hostname": &login.hostname,
+            ":hostname": login.hostname,
             ":http_realm": login.http_realm.as_ref(),
             ":form_submit": login.form_submit_url.as_ref(),
         };
